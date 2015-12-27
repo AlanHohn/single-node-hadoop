@@ -1,0 +1,80 @@
+---
+- hosts: all
+  sudo: yes
+  tasks:
+  - name: hostname file
+    lineinfile: dest=/etc/hostname regexp=".*" line="hadoop"
+  - name: set hostname
+    command: hostnamectl set-hostname hadoop
+  - name: update
+    apt: upgrade=yes
+    environment: proxy_env
+  - name: Install packages
+    apt: pkg={{item}} state=installed
+    environment: proxy_env
+    with_items:
+        - openjdk-8-jdk
+  - name: download hadoop
+    get_url:
+      url: http://mirrors.ibiblio.org/apache/hadoop/common/hadoop-{{hadoop_version}}/hadoop-{{hadoop_version}}.tar.gz
+      dest: /opt/hadoop.tar.gz
+    environment: proxy_env
+  - name: unpack hadoop
+    unarchive: 
+      src: /opt/hadoop.tar.gz
+      dest: /opt
+      creates: /opt/hadoop-{{hadoop_version}}
+      copy: no 
+      owner: vagrant 
+      group: vagrant
+  - name: hadoop current version link
+    file: path=/opt/hadoop src=/opt/hadoop-{{hadoop_version}} state=link owner=vagrant group=vagrant
+  - name: hadoop config files
+    copy: dest=/opt/hadoop/etc/hadoop/{{item}} src=files/{{item}} mode=0644 owner=vagrant group=vagrant
+    with_items:
+        - hadoop-env.sh
+        - core-site.xml
+        - hdfs-site.xml
+        - mapred-site.xml
+        - yarn-site.xml
+    notify: restart services
+  - name: hadoop format namenode
+    command: /opt/hadoop/bin/hdfs namenode -format 
+    become: yes
+    become_user: vagrant
+    args:
+      creates: /opt/hadoop/dfs
+  - name: hadoop service files
+    copy: dest=/lib/systemd/system/{{item}} src=files/{{item}} mode=0644 owner=root group=root
+    with_items:
+        - hdfs-namenode.service
+        - hdfs-datanode.service
+        - yarn-resourcemanager.service
+        - yarn-nodemanager.service
+        - yarn-proxyserver.service
+        - yarn-historyserver.service
+    notify: reload systemd
+  - meta: flush_handlers
+  - name: hadoop services
+    service: name={{item}} state=started enabled=yes
+    with_items:
+        - hdfs-namenode
+        - hdfs-datanode
+        - yarn-resourcemanager
+        - yarn-nodemanager
+        - yarn-proxyserver
+        - yarn-historyserver
+  handlers:
+  - name: reload systemd
+    command: systemctl daemon-reload
+  - name: restart services
+    service: name={{item}} state=restarted
+    with_items:
+        - hdfs-namenode
+        - hdfs-datanode
+        - yarn-resourcemanager
+        - yarn-nodemanager
+        - yarn-proxyserver
+        - yarn-historyserver
+
+

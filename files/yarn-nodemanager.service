@@ -1,0 +1,10 @@
+[Unit]
+Description=Hadoop YARN Node Manager
+
+[Service]
+Type=forking
+ExecStart=/opt/hadoop/sbin/yarn-daemon.sh start nodemanager
+User=vagrant
+
+[Install]
+WantedBy=multi-user.target

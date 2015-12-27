@@ -1,0 +1,10 @@
+[Unit]
+Description=Hadoop Distributed File System Data Node
+
+[Service]
+Type=forking
+ExecStart=/opt/hadoop/sbin/hadoop-daemon.sh --script hdfs start datanode
+User=vagrant
+
+[Install]
+WantedBy=multi-user.target

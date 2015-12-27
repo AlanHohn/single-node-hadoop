@@ -1,0 +1,10 @@
+[Unit]
+Description=Hadoop YARN Resource Manager
+
+[Service]
+Type=forking
+ExecStart=/opt/hadoop/sbin/yarn-daemon.sh start resourcemanager
+User=vagrant
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+[Unit]
+Description=Hadoop YARN Proxy Server
+
+[Service]
+Type=forking
+ExecStart=/opt/hadoop/sbin/yarn-daemon.sh start proxyserver
+User=vagrant
+
+[Install]
+WantedBy=multi-user.target
