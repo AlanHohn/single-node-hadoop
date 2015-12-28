@@ -44,7 +44,24 @@
     become_user: vagrant
     args:
       creates: /opt/hadoop/dfs
-  - name: hadoop service files
+  - name: download spark
+    get_url:
+      url: http://mirrors.ibiblio.org/apache/spark/spark-{{spark_version}}/spark-{{spark_version}}-bin-hadoop2.6.tgz
+      dest: /opt/spark.tar.gz
+    environment: proxy_env
+  - name: unpack spark
+    unarchive: 
+      src: /opt/spark.tar.gz
+      dest: /opt
+      creates: /opt/spark-{{spark_version}}
+      copy: no 
+      owner: vagrant 
+      group: vagrant
+  - name: spark current version link
+    file: path=/opt/spark src=/opt/spark-{{spark_version}}-bin-hadoop2.6 state=link owner=vagrant group=vagrant
+  - name: hadoop conf dir in environment
+    copy: dest=/etc/profile.d/hadoop-conf.sh content="export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop" mode=0644
+  - name: service files
     copy: dest=/lib/systemd/system/{{item}} src=files/{{item}} mode=0644 owner=root group=root
     with_items:
         - hdfs-namenode.service
@@ -55,7 +72,7 @@
         - yarn-historyserver.service
     notify: reload systemd
   - meta: flush_handlers
-  - name: hadoop services
+  - name: services
     service: name={{item}} state=started enabled=yes
     with_items:
         - hdfs-namenode

@@ -6,6 +6,7 @@ VAGRANTFILE_API_VERSION = "2"
 
 proxy = ENV['http_proxy'] || ""
 hadoopver = ENV['hadoop_version'] || "2.6.3"
+sparkver = ENV['spark_version'] || "1.5.2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/wily64"
@@ -23,7 +24,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       proxy_env: {
         http_proxy: proxy
       },
-      hadoop_version: hadoopver
+      hadoop_version: hadoopver,
+      spark_version: sparkver
     }
   end
 
