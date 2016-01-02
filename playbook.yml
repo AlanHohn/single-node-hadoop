@@ -17,11 +17,11 @@
   - name: download hadoop
     get_url:
       url: http://mirrors.ibiblio.org/apache/hadoop/common/hadoop-{{hadoop_version}}/hadoop-{{hadoop_version}}.tar.gz
-      dest: /opt/hadoop.tar.gz
+      dest: /opt/hadoop-{{hadoop_version}}.tar.gz
     environment: proxy_env
   - name: unpack hadoop
     unarchive: 
-      src: /opt/hadoop.tar.gz
+      src: /opt/hadoop-{{hadoop_version}}.tar.gz
       dest: /opt
       creates: /opt/hadoop-{{hadoop_version}}
       copy: no 
@@ -47,11 +47,11 @@
   - name: download spark
     get_url:
       url: http://mirrors.ibiblio.org/apache/spark/spark-{{spark_version}}/spark-{{spark_version}}-bin-hadoop2.6.tgz
-      dest: /opt/spark.tar.gz
+      dest: /opt/spark-{{spark_version}}.tar.gz
     environment: proxy_env
   - name: unpack spark
     unarchive: 
-      src: /opt/spark.tar.gz
+      src: /opt/spark-{{spark_version}}.tar.gz
       dest: /opt
       creates: /opt/spark-{{spark_version}}
       copy: no 
