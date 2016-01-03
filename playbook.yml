@@ -29,6 +29,7 @@
       group: vagrant
   - name: hadoop current version link
     file: path=/opt/hadoop src=/opt/hadoop-{{hadoop_version}} state=link owner=vagrant group=vagrant
+    notify: restart services
   - name: hadoop config files
     copy: dest=/opt/hadoop/etc/hadoop/{{item}} src=files/{{item}} mode=0644 owner=vagrant group=vagrant
     with_items:
