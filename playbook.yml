@@ -1,6 +1,6 @@
 ---
 - hosts: all
-  sudo: yes
+  become: yes
   tasks:
   - name: hostname file
     lineinfile: dest=/etc/hostname regexp=".*" line="hadoop"
@@ -8,17 +8,17 @@
     command: hostnamectl set-hostname hadoop
   - name: update
     apt: upgrade=yes
-    environment: proxy_env
+    environment: "{{ proxy_env }}"
   - name: Install packages
     apt: pkg={{item}} state=installed
-    environment: proxy_env
+    environment: "{{ proxy_env }}"
     with_items:
         - openjdk-8-jdk
   - name: download hadoop
     get_url:
       url: http://mirrors.ibiblio.org/apache/hadoop/common/hadoop-{{hadoop_version}}/hadoop-{{hadoop_version}}.tar.gz
       dest: /opt/hadoop-{{hadoop_version}}.tar.gz
-    environment: proxy_env
+    environment: "{{ proxy_env }}"
   - name: unpack hadoop
     unarchive: 
       src: /opt/hadoop-{{hadoop_version}}.tar.gz
@@ -49,7 +49,7 @@
     get_url:
       url: http://mirrors.ibiblio.org/apache/spark/spark-{{spark_version}}/spark-{{spark_version}}-bin-hadoop2.6.tgz
       dest: /opt/spark-{{spark_version}}.tar.gz
-    environment: proxy_env
+    environment: "{{ proxy_env }}"
   - name: unpack spark
     unarchive: 
       src: /opt/spark-{{spark_version}}.tar.gz
